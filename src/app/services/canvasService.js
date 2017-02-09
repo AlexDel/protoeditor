@@ -55,9 +55,20 @@ class CanvasService {
   }
   
   addLine() {
-    const lineCoords = [100, 200, 200, 200];
+    const lineCoords = [100, 200, 300, 200];
     const line = new this.fabric.Line(lineCoords, this.defaultPresets);
     this.render(line);
+  }
+  
+  addText() {
+    const textProps = {
+      textAlign: 'center',
+      fontSize: 35,
+      strokeWidth: 1,
+      fill: 'red'
+    };
+    const text = new this.fabric.IText('Enter your text', {...this.defaultPresets, ...textProps});
+    this.render(text);
   }
   
   static instance() {
