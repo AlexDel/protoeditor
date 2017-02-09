@@ -1,7 +1,7 @@
 import angular from 'angular';
 
 class CanvasService {
-  constructor () {
+  constructor() {
     this.fabric = fabric;
     this.initCanvas();
     let url = 'http://loveopium.ru/content/2012/04/baikal2/22.jpg';
@@ -10,7 +10,6 @@ class CanvasService {
     this.defaultPresets = {
       left: 400,
       top: 400,
-      radius: 100,
       strokeWidth: 5,
       stroke: 'red',
       fill: 'rgba(0,0,0,0)',
@@ -25,7 +24,7 @@ class CanvasService {
   }
   
   addImage(imageUrl) {
-    this.fabric.Image.fromURL(imageUrl,(img) => {
+    this.fabric.Image.fromURL(imageUrl, (img) => {
       img.selectable = false;
       img.evented = false;
       img.scaleToWidth(1040);
@@ -33,8 +32,11 @@ class CanvasService {
     });
   }
   
-  addCircle(){
-    const circle = new this.fabric.Circle(this.defaultPresets);
+  addCircle() {
+    const cirlceProps = {
+      radius: 100
+    };
+    const circle = new this.fabric.Circle({ ...this.defaultPresets, ...cirlceProps });
     this.canvas.add(circle);
   }
   
