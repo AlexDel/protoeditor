@@ -5,13 +5,13 @@ class CanvasService {
     this.fabric = fabric;
     this.initCanvas();
     
-    let url = 'http://loveopium.ru/content/2012/04/baikal2/22.jpg';
-    //this.addImage(url);
+    let url = '/images/22.jpg';
+    this.addImage(url);
     
     this.defaultPresets = {
       left: 400,
       top: 400,
-      strokeWidth: 5,
+      strokeWidth: 2,
       stroke: 'red',
       fill: 'rgba(0,0,0,0)',
       selectable: true,
