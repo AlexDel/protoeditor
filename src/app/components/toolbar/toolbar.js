@@ -1,3 +1,5 @@
+import './toolbar.css';
+
 class ToolbarCtrl {
   constructor(canvasService) {
     this.canvasService = canvasService;

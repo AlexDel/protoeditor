@@ -54,6 +54,12 @@ class CanvasService {
     this.render(rect);
   }
   
+  addLine() {
+    const lineCoords = [100, 200, 200, 200];
+    const line = new this.fabric.Line(lineCoords, this.defaultPresets);
+    this.render(line);
+  }
+  
   static instance() {
     return new CanvasService();
   }
