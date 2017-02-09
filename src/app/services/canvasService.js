@@ -6,7 +6,7 @@ class CanvasService {
     this.initCanvas();
     
     let url = 'http://loveopium.ru/content/2012/04/baikal2/22.jpg';
-    this.addImage(url);
+    //this.addImage(url);
     
     this.defaultPresets = {
       left: 400,
@@ -32,6 +32,7 @@ class CanvasService {
     this.fabric.Image.fromURL(imageUrl, (img) => {
       img.selectable = false;
       img.evented = false;
+      img.crossOrigin = true;
       img.scaleToWidth(1040);
       this.render(img);
     });
@@ -69,6 +70,15 @@ class CanvasService {
     };
     const text = new this.fabric.IText('Enter your text', {...this.defaultPresets, ...textProps});
     this.render(text);
+  }
+  
+  dumpImage() {
+    this.canvas.deactivateAll().renderAll();
+    const image = this.canvas.toDataURL('png');
+    const virtualLink = angular.element('<a></a>')[0];
+    virtualLink.href = image;
+    virtualLink.download = 'mypic.png';
+    virtualLink.click();
   }
   
   static instance() {
