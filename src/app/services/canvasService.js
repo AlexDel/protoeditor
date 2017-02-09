@@ -4,6 +4,7 @@ class CanvasService {
   constructor() {
     this.fabric = fabric;
     this.initCanvas();
+    
     let url = 'http://loveopium.ru/content/2012/04/baikal2/22.jpg';
     this.addImage(url);
     
@@ -23,12 +24,16 @@ class CanvasService {
     this.canvas = new this.fabric.Canvas(document.querySelectorAll('#canvas')[0]);
   }
   
+  render(canvasObj) {
+    this.canvas.add(canvasObj);
+  }
+  
   addImage(imageUrl) {
     this.fabric.Image.fromURL(imageUrl, (img) => {
       img.selectable = false;
       img.evented = false;
       img.scaleToWidth(1040);
-      this.canvas.add(img);
+      this.render(img);
     });
   }
   
@@ -37,7 +42,16 @@ class CanvasService {
       radius: 100
     };
     const circle = new this.fabric.Circle({ ...this.defaultPresets, ...cirlceProps });
-    this.canvas.add(circle);
+    this.render(circle);
+  }
+  
+  addRect() {
+    const rectProps = {
+      width: 300,
+      height: 200
+    };
+    const rect = new this.fabric.Rect({ ...this.defaultPresets, ...rectProps });
+    this.render(rect);
   }
   
   static instance() {
