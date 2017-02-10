@@ -6,7 +6,7 @@ class CanvasService {
     this.initCanvas();
     
     let url = '/images/22.jpg';
-    this.addImage(url);
+    this.setBackground(url);
     
     this.defaultPresets = {
       left: 400,
@@ -28,13 +28,13 @@ class CanvasService {
     this.canvas.add(canvasObj);
   }
   
-  addImage(imageUrl) {
+  setBackground(imageUrl) {
     this.fabric.Image.fromURL(imageUrl, (img) => {
-      img.selectable = false;
-      img.evented = false;
-      img.crossOrigin = true;
-      img.scaleToWidth(1040);
-      this.render(img);
+      this.background = img;
+      this.background.selectable = false;
+      this.background.evented = false;
+      this.background.scaleToWidth(1040);
+      this.render(this.background);
     });
   }
   
@@ -52,7 +52,6 @@ class CanvasService {
       height: 200
     };
     const rect = new this.fabric.Rect({ ...this.defaultPresets, ...rectProps });
-    this.render(rect);
   }
   
   addLine() {
@@ -70,6 +69,40 @@ class CanvasService {
     };
     const text = new this.fabric.IText('Enter your text', {...this.defaultPresets, ...textProps});
     this.render(text);
+  }
+  
+  activateCrop() {
+    // create unshaded copy of background
+    const unshadedBG = this.fabric.util.object.clone(this.background);
+    
+    // set shades for whole bg
+    this.background.filters[0] = new this.fabric.Image.filters.Tint({
+      color: '#000000',
+      opacity: 0.5
+    });
+    this.background.applyFilters(this.canvas.renderAll.bind(this.canvas));
+    
+    this.cropZone = new this.fabric.Rect({
+      left: 400,
+      top: 400,
+      strokeWidth: 1,
+      stroke: 'rgba(0,0,0,0)',
+      fill: 'rgba(0,0,0,0)',
+      selectable: true,
+      originX: 'center',
+      originY: 'center',
+      width: 300,
+      height: 200
+    })
+    
+    this.canvas.add(this.cropZone);
+    this.canvas.setActiveObject(this.cropZone);
+    
+    unshadedBG.clipTo = (ctx) => {
+      console.log(this.cropZone);
+      ctx.rect(0, 0, this.cropZone.width, this.cropZone.height);
+    };
+    this.render(unshadedBG);
   }
   
   dumpImage() {
