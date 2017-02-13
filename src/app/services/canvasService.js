@@ -33,7 +33,6 @@ class CanvasService {
       this.background = img;
       this.background.selectable = false;
       this.background.evented = false;
-      this.background.scaleToWidth(1040);
       this.render(this.background);
     });
   }
@@ -72,37 +71,49 @@ class CanvasService {
   }
   
   activateCrop() {
-    // create unshaded copy of background
-    const unshadedBG = this.fabric.util.object.clone(this.background);
-    
-    // set shades for whole bg
-    this.background.filters[0] = new this.fabric.Image.filters.Tint({
-      color: '#000000',
-      opacity: 0.5
-    });
-    this.background.applyFilters(this.canvas.renderAll.bind(this.canvas));
-    
-    this.cropZone = new this.fabric.Rect({
-      left: 400,
-      top: 400,
-      strokeWidth: 1,
-      stroke: 'rgba(0,0,0,0)',
-      fill: 'rgba(0,0,0,0)',
-      selectable: true,
-      originX: 'center',
-      originY: 'center',
-      width: 300,
-      height: 200
-    })
-    
-    this.canvas.add(this.cropZone);
-    this.canvas.setActiveObject(this.cropZone);
-    
-    unshadedBG.clipTo = (ctx) => {
-      console.log(this.cropZone);
-      ctx.rect(0, 0, this.cropZone.width, this.cropZone.height);
-    };
-    this.render(unshadedBG);
+    if (!this.cropActive) {
+      // create unshaded copy of background
+      const unshadedBG = this.fabric.util.object.clone(this.background);
+  
+      // set shades for whole bg
+      this.background.filters[0] = new this.fabric.Image.filters.Tint({
+        color: '#000000',
+        opacity: 0.5
+      });
+      this.background.applyFilters(this.canvas.renderAll.bind(this.canvas));
+  
+      this.cropZone = new this.fabric.Rect({
+        strokeWidth: 1,
+        stroke: 'rgba(0,0,0,0)',
+        fill: 'rgba(0,0,0,0)',
+        selectable: true,
+        width: 300,
+        height: 200,
+      });
+  
+      // disable rotation
+      this.cropZone.setControlsVisibility({
+        mtr: false
+      });
+  
+      this.canvas.add(this.cropZone);
+      this.canvas.setActiveObject(this.cropZone);
+  
+  
+      unshadedBG.clipTo = (ctx) => {
+        ctx.rect(
+          ((unshadedBG.width / 2) * -1) - unshadedBG.left + this.cropZone.left,
+          ((unshadedBG.height / 2) * -1) - unshadedBG.top + this.cropZone.top,
+          this.cropZone.width * this.cropZone.scaleX,
+          this.cropZone.height * this.cropZone.scaleY);
+      };
+      this.canvas.add(unshadedBG);
+      
+      // append "apply crop button"
+      
+      // protect crop mode from muliple clicks
+      this.cropActive = true;
+    }
   }
   
   dumpImage() {
