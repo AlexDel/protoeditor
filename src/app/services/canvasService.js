@@ -74,14 +74,14 @@ class CanvasService {
     if (!this.cropActive) {
       // create unshaded copy of background
       const unshadedBG = this.fabric.util.object.clone(this.background);
-  
+      
       // set shades for whole bg
       this.background.filters[0] = new this.fabric.Image.filters.Tint({
         color: '#000000',
         opacity: 0.5
       });
       this.background.applyFilters(this.canvas.renderAll.bind(this.canvas));
-  
+      
       this.cropZone = new this.fabric.Rect({
         strokeWidth: 1,
         stroke: 'rgba(0,0,0,0)',
@@ -90,16 +90,15 @@ class CanvasService {
         width: 300,
         height: 200,
       });
-  
+      
       // disable rotation
       this.cropZone.setControlsVisibility({
         mtr: false
       });
-  
+      
       this.canvas.add(this.cropZone);
       this.canvas.setActiveObject(this.cropZone);
-  
-  
+      
       unshadedBG.clipTo = (ctx) => {
         ctx.rect(
           ((unshadedBG.width / 2) * -1) - unshadedBG.left + this.cropZone.left,
@@ -110,10 +109,49 @@ class CanvasService {
       this.canvas.add(unshadedBG);
       
       // append "apply crop button"
+      this.canvas.on('mouse:move', (e) => {
+        this.addApplyCropBtn(
+          this.cropZone.left + (this.cropZone.width * this.cropZone.scaleX), // posX for apply BTN
+          this.cropZone.top + (this.cropZone.height * this.cropZone.scaleY)  // posY for apply BTN
+        );
+      });
       
       // protect crop mode from muliple clicks
       this.cropActive = true;
     }
+  }
+  
+  addApplyCropBtn(posX = 0, posY = 0) {
+    // delete buttong if exists
+    if(this.cropBtn) {
+      this.canvas.remove(this.cropBtn)
+    }
+    
+    const bg = new this.fabric.Rect({
+      fill: '#32b775',
+      scaleY: 0.5,
+      originX: 'center',
+      originY: 'center',
+      rx: 0,
+      ry: 0,
+      width: 90,
+      height:50
+    });
+    
+    const text = new this.fabric.Text('apply crop', {
+      fontSize: 16,
+      originX: 'center',
+      originY: 'center',
+      fill: '#FFF'
+    });
+    
+    this.cropBtn = new this.fabric.Group([ bg, text ], {
+      left: posX - bg.width,
+      top: posY,
+      selectable: false
+    });
+    
+    this.render(this.cropBtn);
   }
   
   dumpImage() {
