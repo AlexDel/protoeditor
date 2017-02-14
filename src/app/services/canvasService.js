@@ -30,10 +30,16 @@ class CanvasService {
   
   setBackground(imageUrl) {
     this.fabric.Image.fromURL(imageUrl, (img) => {
-      this.background = img;
-      this.background.selectable = false;
-      this.background.evented = false;
-      this.render(this.background);
+      img.scaleToWidth(1040);
+      
+      // double passing img object is done to solve scaling issues with different sized on crop
+      this.fabric.Image.fromURL(img.toDataURL(), (bgImg) => {
+        this.background = bgImg;
+        this.background.evented = false;
+        this.background.selectable = false;
+        this.canvas.sendToBack(this.background);
+        this.render(this.background);
+      });
     });
   }
   
@@ -73,7 +79,7 @@ class CanvasService {
   activateCrop() {
     if (!this.cropActive) {
       // create unshaded copy of background
-      const unshadedBG = this.fabric.util.object.clone(this.background);
+      this.unshadedBG = this.fabric.util.object.clone(this.background);
       
       // set shades for whole bg
       this.background.filters[0] = new this.fabric.Image.filters.Tint({
@@ -99,14 +105,14 @@ class CanvasService {
       this.canvas.add(this.cropZone);
       this.canvas.setActiveObject(this.cropZone);
       
-      unshadedBG.clipTo = (ctx) => {
+      this.unshadedBG.clipTo = (ctx) => {
         ctx.rect(
-          ((unshadedBG.width / 2) * -1) - unshadedBG.left + this.cropZone.left,
-          ((unshadedBG.height / 2) * -1) - unshadedBG.top + this.cropZone.top,
+          ((this.unshadedBG.width / 2) * -1) - this.unshadedBG.left + this.cropZone.left,
+          ((this.unshadedBG.height / 2) * -1) - this.unshadedBG.top + this.cropZone.top,
           this.cropZone.width * this.cropZone.scaleX,
           this.cropZone.height * this.cropZone.scaleY);
       };
-      this.canvas.add(unshadedBG);
+      this.canvas.add(this.unshadedBG);
       
       // append "apply crop button"
       this.canvas.on('mouse:move', (e) => {
@@ -119,6 +125,10 @@ class CanvasService {
       // protect crop mode from muliple clicks
       this.cropActive = true;
     }
+  }
+  
+  deactivateCrop() {
+    
   }
   
   addApplyCropBtn(posX = 0, posY = 0) {
@@ -150,9 +160,25 @@ class CanvasService {
       top: posY,
       selectable: false
     });
+  
+    this.cropBtn.on('mouseup', (e) => {
+      this.applyCrop(e);
+    });
     
     this.render(this.cropBtn);
   }
+  
+  applyCrop(croppedImage) {
+    this.canvas.remove(this.background);
+    this.setBackground(this.unshadedBG.toDataURL({
+      left:  this.cropZone.left,
+      top: this.cropZone.top,
+      width: this.cropZone.width * this.cropZone.scaleX,
+      height: this.cropZone.height * this.cropZone.scaleY
+    }));
+    console.log(this.background);
+  }
+  
   
   dumpImage() {
     this.canvas.deactivateAll().renderAll();
