@@ -21,11 +21,15 @@ class CanvasService {
   }
   
   initCanvas() {
-    this.canvas = new this.fabric.Canvas(document.querySelectorAll('#canvas')[0]);
+    this.canvas = new this.fabric.Canvas(document.querySelectorAll('#canvas')[0], {
+      preserveObjectStacking: true,
+      renderOnAddRemove: true
+    });
   }
   
-  render(canvasObj) {
-    this.canvas.add(canvasObj);
+  render() {
+    this.deactivateCrop();
+    this.canvas.renderAll();
   }
   
   setBackground(imageUrl) {
@@ -34,11 +38,15 @@ class CanvasService {
       
       // double passing img object is done to solve scaling issues with different sized on crop
       this.fabric.Image.fromURL(img.toDataURL(), (bgImg) => {
+        if (this.background) {
+          this.background.remove();
+        }
         this.background = bgImg;
         this.background.evented = false;
         this.background.selectable = false;
+        this.canvas.add(this.background);
         this.canvas.sendToBack(this.background);
-        this.render(this.background);
+        this.render();
       });
     });
   }
@@ -48,7 +56,8 @@ class CanvasService {
       radius: 100
     };
     const circle = new this.fabric.Circle({ ...this.defaultPresets, ...cirlceProps });
-    this.render(circle);
+    this.canvas.add(circle);
+    this.render();
   }
   
   addRect() {
@@ -56,13 +65,16 @@ class CanvasService {
       width: 300,
       height: 200
     };
-    const rect = new this.fabric.Rect({ ...this.defaultPresets, ...rectProps });
+    const rect = new this.fabric.Rect({...this.defaultPresets, ...rectProps });
+    this.canvas.add(rect);
+    this.render();
   }
   
   addLine() {
     const lineCoords = [100, 200, 300, 200];
     const line = new this.fabric.Line(lineCoords, this.defaultPresets);
-    this.render(line);
+    this.canvas.add(line);
+    this.render();
   }
   
   addText() {
@@ -73,7 +85,8 @@ class CanvasService {
       fill: 'red'
     };
     const text = new this.fabric.IText('Enter your text', {...this.defaultPresets, ...textProps});
-    this.render(text);
+    this.canvas.add(text)
+    this.render();
   }
   
   activateCrop() {
@@ -127,17 +140,13 @@ class CanvasService {
     }
   }
   
-  deactivateCrop() {
-    
-  }
-  
   addApplyCropBtn(posX = 0, posY = 0) {
     // delete buttong if exists
-    if(this.cropBtn) {
+    if (this.cropBtn) {
       this.canvas.remove(this.cropBtn)
     }
     
-    const bg = new this.fabric.Rect({
+    this.applyCropBtnBg = new this.fabric.Rect({
       fill: '#32b775',
       scaleY: 0.5,
       originX: 'center',
@@ -145,18 +154,18 @@ class CanvasService {
       rx: 0,
       ry: 0,
       width: 90,
-      height:50
+      height: 50
     });
-    
-    const text = new this.fabric.Text('apply crop', {
+  
+    this.applyCropBtnText = new this.fabric.Text('apply crop', {
       fontSize: 16,
       originX: 'center',
       originY: 'center',
       fill: '#FFF'
     });
     
-    this.cropBtn = new this.fabric.Group([ bg, text ], {
-      left: posX - bg.width,
+    this.cropBtn = new this.fabric.Group([ this.applyCropBtnBg, this.applyCropBtnText ], {
+      left: posX - this.applyCropBtnBg.width,
       top: posY,
       selectable: false
     });
@@ -165,18 +174,28 @@ class CanvasService {
       this.applyCrop(e);
     });
     
-    this.render(this.cropBtn);
+    this.canvas.add(this.cropBtn);
+    this.render();
   }
   
   applyCrop(croppedImage) {
-    this.canvas.remove(this.background);
     this.setBackground(this.unshadedBG.toDataURL({
-      left:  this.cropZone.left,
+      left: this.cropZone.left,
       top: this.cropZone.top,
       width: this.cropZone.width * this.cropZone.scaleX,
       height: this.cropZone.height * this.cropZone.scaleY
     }));
-    console.log(this.background);
+    this.render();
+    this.deactivateCrop();
+  }
+  
+  deactivateCrop() {
+    this.cropZone.remove();
+    this.applyCropBtnText.remove();
+    this.applyCropBtnBg.remove();
+    this.cropBtn.remove();
+    this.unshadedBG.remove();
+    this.render();
   }
   
   
