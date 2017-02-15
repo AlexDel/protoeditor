@@ -4,7 +4,8 @@ import '../style/app.css';
 angular.module('app',
   [
     require('angular-ui-router'),
-    require('angular-bootstrap-npm')
+    require('angular-bootstrap-npm'),
+    require('angular-base64-upload')
   ])
   .config(['$stateProvider', '$urlRouterProvider', ($stateProvider, $urlRouterProvider) => {
     $urlRouterProvider.otherwise('/editor');
