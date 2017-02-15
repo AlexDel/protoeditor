@@ -83,7 +83,7 @@ class CanvasService {
   
   addLine() {
     const lineCoords = [100, 200, 300, 200];
-    const line = new this.fabric.Line(lineCoords, this.defaultPresets);
+    const line = new this.fabric.Line(lineCoords, { ...this.defaultPresets, stroke: this.getColor() });
     this.canvas.add(line);
     this.render();
   }
