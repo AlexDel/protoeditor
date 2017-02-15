@@ -7,6 +7,9 @@ class ToolbarCtrl {
   
   $onInit() {
     this.drawer = this.canvasService;
+    
+    this.availableColors = ['#000000', '#ffffff', '#ff0000', '#0066ff', '#009900', '#ff3399'];
+    this.currentColor = this.availableColors[0];
   }
 }
 

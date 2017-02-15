@@ -12,7 +12,7 @@ class CanvasService {
       left: 400,
       top: 400,
       strokeWidth: 2,
-      stroke: 'red',
+      stroke: this.getColor(),
       fill: 'rgba(0,0,0,0)',
       selectable: true,
       originX: 'center',
@@ -28,7 +28,6 @@ class CanvasService {
   }
   
   render() {
-    this.deactivateCrop();
     this.canvas.renderAll();
   }
   
@@ -60,6 +59,19 @@ class CanvasService {
     this.render();
   }
   
+  setColor(color = '#000000') {
+    this.color = color;
+    this.canvas.getActiveObject().set('stroke', this.getColor());
+    if (this.canvas.getActiveObject().get('type') === 'i-text') {
+      this.canvas.getActiveObject().set('fill', this.getColor());
+    }
+    this.render();
+  }
+  
+  getColor() {
+    return this.color || '#000000';
+  }
+  
   addRect() {
     const rectProps = {
       width: 300,
@@ -82,7 +94,7 @@ class CanvasService {
       textAlign: 'center',
       fontSize: 35,
       strokeWidth: 1,
-      fill: 'red'
+      fill: this.getColor()
     };
     const text = new this.fabric.IText('Enter your text', {...this.defaultPresets, ...textProps});
     this.canvas.add(text)

@@ -6,5 +6,15 @@
         <li><a title="Add rectangle" ng-click="$ctrl.drawer.addRect()"><i class="fa fa-square-o fa-2x" aria-hidden="true"></i></a></li>
         <li><a title="Add text" ng-click="$ctrl.drawer.addText()"><i class="fa fa-font fa-2x" aria-hidden="true"></i></a></li>
         <li><a title="Download as PNG" ng-click="$ctrl.drawer.dumpImage()"><i class="fa fa-download fa-2x" aria-hidden="true"></i></a></li>
+        <li uib-dropdown>
+            <a href id="simple-dropdown" uib-dropdown-toggle>
+                <i class="fa fa-circle fa-2x" ng-style="{color: $ctrl.currentColor}" aria-hidden="true"></i>
+            </a>
+            <ul class="dropdown-menu list-inline" uib-dropdown-menu aria-labelledby="simple-dropdown">
+                <li ng-repeat="color in $ctrl.availableColors" ng-click="$ctrl.currentColor = color; $ctrl.drawer.setColor(color)">
+                    <a><i class="fa fa-circle fa-2x" ng-style="{color: color}" aria-hidden="true"></i></a>
+                </li>
+            </ul>
+        </li>
     </ul>
 </div>
