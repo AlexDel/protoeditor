@@ -12,7 +12,6 @@ class CanvasService {
       left: 400,
       top: 400,
       strokeWidth: 2,
-      stroke: this.getColor(),
       fill: 'rgba(0,0,0,0)',
       selectable: true,
       originX: 'center',
@@ -54,7 +53,7 @@ class CanvasService {
     const cirlceProps = {
       radius: 100
     };
-    const circle = new this.fabric.Circle({ ...this.defaultPresets, ...cirlceProps });
+    const circle = new this.fabric.Circle({ ...this.defaultPresets, ...cirlceProps, stroke: this.getColor() });
     this.canvas.add(circle);
     this.render();
   }
@@ -77,7 +76,7 @@ class CanvasService {
       width: 300,
       height: 200
     };
-    const rect = new this.fabric.Rect({...this.defaultPresets, ...rectProps });
+    const rect = new this.fabric.Rect({...this.defaultPresets, ...rectProps, stroke: this.getColor() });
     this.canvas.add(rect);
     this.render();
   }
@@ -96,7 +95,7 @@ class CanvasService {
       strokeWidth: 1,
       fill: this.getColor()
     };
-    const text = new this.fabric.IText('Enter your text', {...this.defaultPresets, ...textProps});
+    const text = new this.fabric.IText('Enter your text', {...this.defaultPresets, ...textProps, stroke: this.getColor()});
     this.canvas.add(text)
     this.render();
   }
